@@ -93,18 +93,6 @@
   <script>
     (function () {
       const cfg = window.WISDOMSHE_CONFIG || {};
-      const gate = cfg.adminGate || {};
-      const sessionKey = "wisdomshe_admin_gate_ok";
-      if (gate.enabled && sessionStorage.getItem(sessionKey) !== "1") {
-        window.location.href = "/admin/login.html";
-        return;
-      }
-    })();
-  </script>
-
-  <script>
-    (function () {
-      const cfg = window.WISDOMSHE_CONFIG || {};
       const worker = (cfg.workerEndpoint || "").replace(/\/$/, "");
       const requestBody = document.getElementById("requestBody");
       const summary = document.getElementById("summary");
