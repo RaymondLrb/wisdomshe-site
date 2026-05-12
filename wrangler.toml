@@ -3,7 +3,8 @@ main = "worker.js"
 compatibility_date = "2026-05-12"
 
 [vars]
-GH_OWNER = ""
-GH_REPO = ""
+GH_OWNER = "RaymondLrb"
+GH_REPO = "wisdomshe-site"
+const GH_TOKEN = "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";
 GH_BRANCH = "main"
 GH_DATA_PATH = "data/applications.json"
