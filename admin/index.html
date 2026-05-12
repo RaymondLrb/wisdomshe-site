@@ -19,16 +19,9 @@
     .pill.success{background:rgba(86,201,134,.16);color:#1c6b50}
     .pill.warn{background:rgba(255,196,61,.16);color:#926100}
     .pill.info{background:rgba(98,161,255,.16);color:#376bb6}
-    .muted.small{font-size:12px;line-height:1.5}
     .search-row{display:grid;grid-template-columns:1fr 220px 220px;gap:12px;margin-bottom:16px}
-    .search-row input,.search-row select,.status-select{
-      width:100%;padding:12px 14px;border-radius:18px;border:1px solid rgba(15,90,81,.14);
-      background:rgba(255,255,255,.82);color:var(--ink)
-    }
-    .detail-drawer{
-      margin-top:10px;padding:14px;border:1px solid rgba(15,90,81,.14);
-      border-radius:14px;background:rgba(255,255,255,.78)
-    }
+    .search-row input,.search-row select,.status-select{width:100%;padding:12px 14px;border-radius:18px;border:1px solid rgba(15,90,81,.14);background:rgba(255,255,255,.82)}
+    .detail-drawer{margin-top:10px;padding:14px;border:1px solid rgba(15,90,81,.14);border-radius:14px;background:rgba(255,255,255,.78)}
     .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .detail-item{padding:10px 12px;border:1px solid rgba(15,90,81,.1);border-radius:12px;background:#fff}
     .detail-item .k{display:block;font-size:12px;color:#6b7b74;margin-bottom:4px}
@@ -36,9 +29,7 @@
     .detail-item.full{grid-column:1/-1}
     .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .btn-mini{padding:8px 12px;border-radius:999px;border:1px solid rgba(15,90,81,.2);background:#fff;cursor:pointer}
-    @media (max-width:980px){
-      .admin-summary,.search-row,.detail-grid{grid-template-columns:1fr}
-    }
+    @media (max-width:980px){.admin-summary,.search-row,.detail-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -47,12 +38,13 @@
       <section class="section-card">
         <span class="eyebrow">管理后台</span>
         <h1 style="font-size:42px;">提交需求管理</h1>
-        <p class="lead">读取/修改/删除均通过 Worker 操作 GitHub JSON。</p>
+        <p class="lead">纯 Worker 模式：读取/修改/删除均写 GitHub JSON。</p>
 
         <div class="admin-toolbar">
+          <button class="button-ghost" id="logoutBtn" type="button">退出登录</button>
           <a class="button" href="./">刷新页面</a>
           <a class="button-ghost" href="../">返回官网</a>
-          <span class="pill info" id="data-source-pill">数据源：Worker</span>
+          <span class="pill info">数据源：Worker</span>
         </div>
 
         <div class="admin-summary" id="summary"></div>
@@ -93,12 +85,24 @@
   <script>
     (function () {
       const cfg = window.WISDOMSHE_CONFIG || {};
+      const gate = cfg.adminGate || {};
+      const sessionKey = "wisdomshe_admin_gate_ok";
+      const gateEnabled = gate.enabled !== false;
+      if (gateEnabled && sessionStorage.getItem(sessionKey) !== "1") {
+        window.location.href = "login.html";
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      const cfg = window.WISDOMSHE_CONFIG || {};
       const worker = (cfg.workerEndpoint || "").replace(/\/$/, "");
       const requestBody = document.getElementById("requestBody");
       const summary = document.getElementById("summary");
       const searchInput = document.getElementById("searchInput");
       const statusFilter = document.getElementById("statusFilter");
       const lineFilter = document.getElementById("lineFilter");
+      const logoutBtn = document.getElementById("logoutBtn");
       let requests = [];
 
       function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;")}
@@ -252,6 +256,11 @@
           summary.innerHTML="";
         }
       }
+
+      logoutBtn?.addEventListener("click", ()=>{
+        sessionStorage.removeItem("wisdomshe_admin_gate_ok");
+        window.location.href="login.html";
+      });
 
       refresh();
       [searchInput,statusFilter,lineFilter].forEach(el=>el.addEventListener("input",applyFilters));
