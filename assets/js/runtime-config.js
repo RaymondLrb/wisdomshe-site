@@ -1,5 +1,10 @@
-﻿window.WISDOMSHE_CONFIG = {
+window.WISDOMSHE_CONFIG = {
   apiOrigin: "",
   adminOrigin: "",
-  workerEndpoint: "https://wisdomshe-worker.wisdomshe-worker.workers.dev/"
+  workerEndpoint: "https://wisdomshe-worker.wisdomshe-worker.workers.dev",
+  adminGate: {
+    enabled: true,
+    username: "admin",
+    password: "Aa112211"
+  }
 };
