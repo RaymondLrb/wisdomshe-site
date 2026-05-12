@@ -1,0 +1,9 @@
+﻿name = "wisdomshe-worker"
+main = "worker.js"
+compatibility_date = "2026-05-12"
+
+[vars]
+GH_OWNER = ""
+GH_REPO = ""
+GH_BRANCH = "main"
+GH_DATA_PATH = "data/applications.json"

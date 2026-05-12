@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>后台管理 | shedatahk limited</title>
+  <link rel="stylesheet" href="../assets/css/wisdomshe.css" />
+  <style>
+    .admin-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:24px 0 32px}
+    .admin-summary .card{padding:20px}
+    .admin-summary strong{display:block;font-size:28px;margin-top:8px}
+    .admin-toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0}
+    .admin-table-wrap{overflow-x:auto}
+    .admin-table{width:100%;border-collapse:collapse;min-width:1180px}
+    .admin-table th,.admin-table td{padding:14px 12px;border-bottom:1px solid rgba(15,90,81,.08);vertical-align:top;text-align:left}
+    .admin-table th{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:rgba(28,36,34,.72)}
+    .admin-table td{font-size:14px}
+    .pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(15,90,81,.08);font-size:12px;white-space:nowrap}
+    .pill.success{background:rgba(86,201,134,.16);color:#1c6b50}
+    .pill.warn{background:rgba(255,196,61,.16);color:#926100}
+    .pill.info{background:rgba(98,161,255,.16);color:#376bb6}
+    .muted.small{font-size:12px;line-height:1.5}
+    .search-row{display:grid;grid-template-columns:1fr 220px 220px;gap:12px;margin-bottom:16px}
+    .search-row input,.search-row select,.status-select{
+      width:100%;padding:12px 14px;border-radius:18px;border:1px solid rgba(15,90,81,.14);
+      background:rgba(255,255,255,.82);color:var(--ink)
+    }
+    .detail-drawer{
+      margin-top:10px;padding:14px;border:1px solid rgba(15,90,81,.14);
+      border-radius:14px;background:rgba(255,255,255,.78)
+    }
+    .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .detail-item{padding:10px 12px;border:1px solid rgba(15,90,81,.1);border-radius:12px;background:#fff}
+    .detail-item .k{display:block;font-size:12px;color:#6b7b74;margin-bottom:4px}
+    .detail-item .v{word-break:break-word}
+    .detail-item.full{grid-column:1/-1}
+    .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn-mini{padding:8px 12px;border-radius:999px;border:1px solid rgba(15,90,81,.2);background:#fff;cursor:pointer}
+    @media (max-width:980px){
+      .admin-summary,.search-row,.detail-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <main class="page">
+      <section class="section-card">
+        <span class="eyebrow">管理后台</span>
+        <h1 style="font-size:42px;">提交需求管理</h1>
+        <p class="lead">读取/修改/删除均通过 Worker 操作 GitHub JSON。</p>
+
+        <div class="admin-toolbar">
+          <a class="button" href="./">刷新页面</a>
+          <a class="button-ghost" href="../">返回官网</a>
+          <span class="pill info" id="data-source-pill">数据源：Worker</span>
+        </div>
+
+        <div class="admin-summary" id="summary"></div>
+
+        <div class="search-row">
+          <input id="searchInput" type="search" placeholder="搜索称呼、联系方式、需求、业务方向" />
+          <select id="statusFilter">
+            <option value="all">全部状态</option>
+            <option value="new">新提交</option>
+            <option value="reviewing">处理中</option>
+            <option value="closed">已处理</option>
+          </select>
+          <select id="lineFilter">
+            <option value="all">全部业务方向</option>
+            <option value="industry">医药项目与实业 IP</option>
+            <option value="capital">投资组合管理与香港功能地产</option>
+            <option value="general">通用</option>
+          </select>
+        </div>
+
+        <div class="card admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>时间</th><th>称呼</th><th>联系方式</th><th>业务方向</th><th>预算</th><th>需求</th><th>状态</th><th>详情</th><th>删除</th>
+              </tr>
+            </thead>
+            <tbody id="requestBody">
+              <tr><td colspan="9" class="muted">正在加载需求数据...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/runtime-config.js"></script>
+  <script>
+    (function () {
+      const cfg = window.WISDOMSHE_CONFIG || {};
+      const worker = (cfg.workerEndpoint || "").replace(/\/$/, "");
+      const requestBody = document.getElementById("requestBody");
+      const summary = document.getElementById("summary");
+      const searchInput = document.getElementById("searchInput");
+      const statusFilter = document.getElementById("statusFilter");
+      const lineFilter = document.getElementById("lineFilter");
+      let requests = [];
+
+      function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;")}
+      function d(v){try{return v?new Intl.DateTimeFormat("zh-CN",{dateStyle:"medium",timeStyle:"short"}).format(new Date(v)):"—"}catch{return v||"—"}}
+      function ns(s){return (s||"new").toLowerCase()}
+      function nl(l){return (l||"general").toLowerCase()}
+      function sl(s){const m={new:["新提交","success"],reviewing:["处理中","warn"],closed:["已处理","info"]};return m[ns(s)]||[s,"info"]}
+      function ll(l){const m={industry:"医药项目与实业 IP",capital:"投资组合管理与香港功能地产",general:"通用"};return m[nl(l)]||l}
+      function payload(r){return r.payload||{}}
+      function fv(r,keys){const p=payload(r);for(const k of keys){if(r[k]!=null&&String(r[k]).trim()!=="")return r[k];if(p[k]!=null&&String(p[k]).trim()!=="")return p[k]}return "—"}
+      function st(r){const p=payload(r);return [r.name,r.phone,r.email,r.current_issue,r.service_interest,r.business_line,p.budget_band].filter(Boolean).join(" ").toLowerCase()}
+
+      async function apiGet(){
+        const res=await fetch(`${worker}/applications`);
+        const j=await res.json();
+        if(!res.ok||!j.success) throw new Error(j.error||`HTTP ${res.status}`);
+        return j.items||[];
+      }
+      async function apiPatch(id,status){
+        const res=await fetch(`${worker}/applications/${id}`,{
+          method:"PATCH",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({status})
+        });
+        const j=await res.json();
+        if(!res.ok||!j.success) throw new Error(j.error||`HTTP ${res.status}`);
+      }
+      async function apiDelete(id){
+        const res=await fetch(`${worker}/applications/${id}`,{method:"DELETE"});
+        const j=await res.json();
+        if(!res.ok||!j.success) throw new Error(j.error||`HTTP ${res.status}`);
+      }
+
+      function renderSummary(items){
+        summary.innerHTML=[["总需求",items.length],["新提交",items.filter(i=>ns(i.status)==="new").length],["处理中",items.filter(i=>ns(i.status)==="reviewing").length],["已处理",items.filter(i=>ns(i.status)==="closed").length]]
+          .map(([k,v])=>`<article class="card"><span class="muted">${k}</span><strong>${v}</strong></article>`).join("");
+      }
+
+      function drawerHtml(r){
+        const p=payload(r);
+        return `
+          <div class="detail-drawer">
+            <div class="detail-grid">
+              <div class="detail-item"><span class="k">编号</span><span class="v">${esc(r.code||r.id||"—")}</span></div>
+              <div class="detail-item"><span class="k">提交时间</span><span class="v">${esc(d(r.created_at||r.updated_at))}</span></div>
+              <div class="detail-item"><span class="k">称呼</span><span class="v">${esc(fv(r,["name","applicant_name"]))}</span></div>
+              <div class="detail-item"><span class="k">联系方式</span><span class="v">${esc(fv(r,["phone","email"]))}</span></div>
+              <div class="detail-item"><span class="k">业务方向</span><span class="v">${esc(ll(r.business_line||p.business_line))}</span></div>
+              <div class="detail-item"><span class="k">预算</span><span class="v">${esc(fv(r,["budget_band","budget_note"]))}</span></div>
+              <div class="detail-item full"><span class="k">需求</span><span class="v">${esc(fv(r,["current_issue","service_interest","subject"]))}</span></div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderTable(items){
+        if(!items.length){
+          requestBody.innerHTML='<tr><td colspan="9" class="muted">没有匹配的需求记录。</td></tr>';
+          return;
+        }
+
+        requestBody.innerHTML=items.map((r,i)=>{
+          const [stxt,scls]=sl(r.status);
+          const id=r.id||i+1;
+          const drawerId=`drawer-${id}`;
+          return `<tr data-row-id="${id}">
+            <td>${esc(d(r.created_at||r.updated_at))}</td>
+            <td>${esc(fv(r,["name","applicant_name"]))}</td>
+            <td>${esc(fv(r,["phone","email"]))}</td>
+            <td><span class="pill">${esc(ll(r.business_line||payload(r).business_line))}</span></td>
+            <td>${esc(fv(r,["budget_band","budget_note"]))}</td>
+            <td>${esc(fv(r,["current_issue","service_interest","subject"]))}</td>
+            <td>
+              <span class="pill ${scls}">${esc(stxt)}</span>
+              <div class="detail-actions">
+                <select class="status-select" data-status-id="${id}">
+                  <option value="new" ${ns(r.status)==="new"?"selected":""}>新提交</option>
+                  <option value="reviewing" ${ns(r.status)==="reviewing"?"selected":""}>处理中</option>
+                  <option value="closed" ${ns(r.status)==="closed"?"selected":""}>已处理</option>
+                </select>
+                <button class="btn-mini" data-save-id="${id}">保存</button>
+              </div>
+            </td>
+            <td>
+              <button class="btn-mini" data-toggle-id="${drawerId}">查看</button>
+              <div id="${drawerId}" style="display:none;"></div>
+            </td>
+            <td><button class="btn-mini" data-delete-id="${id}">删除</button></td>
+          </tr>`;
+        }).join("");
+
+        requestBody.querySelectorAll("[data-save-id]").forEach(btn=>{
+          btn.addEventListener("click", async ()=>{
+            const id=btn.getAttribute("data-save-id");
+            const sel=requestBody.querySelector(`[data-status-id="${id}"]`);
+            try{await apiPatch(id, sel.value); await refresh();}catch(e){alert("状态更新失败: "+e.message)}
+          });
+        });
+
+        requestBody.querySelectorAll("[data-delete-id]").forEach(btn=>{
+          btn.addEventListener("click", async ()=>{
+            const id=btn.getAttribute("data-delete-id");
+            if(!confirm("确定删除这条记录吗？")) return;
+            try{await apiDelete(id); await refresh();}catch(e){alert("删除失败: "+e.message)}
+          });
+        });
+
+        requestBody.querySelectorAll("[data-toggle-id]").forEach(btn=>{
+          btn.addEventListener("click", ()=>{
+            const drawerId=btn.getAttribute("data-toggle-id");
+            const box=document.getElementById(drawerId);
+            const row=btn.closest("tr");
+            const idx=[...requestBody.querySelectorAll("tr")].indexOf(row);
+            const r=items[idx];
+            if(!box) return;
+            const isHidden = box.style.display === "none";
+            if(isHidden){
+              box.innerHTML=drawerHtml(r);
+              box.style.display="block";
+              btn.textContent="收起";
+            }else{
+              box.style.display="none";
+              box.innerHTML="";
+              btn.textContent="查看";
+            }
+          });
+        });
+      }
+
+      function applyFilters(){
+        const kw=searchInput.value.trim().toLowerCase();
+        const stv=statusFilter.value;
+        const lv=lineFilter.value;
+        const filtered=requests.filter(r=>{
+          const mk=!kw||st(r).includes(kw);
+          const ms=stv==="all"||ns(r.status)===stv;
+          const ml=lv==="all"||nl(r.business_line)===lv;
+          return mk&&ms&&ml;
+        });
+        renderSummary(filtered);
+        renderTable(filtered);
+      }
+
+      async function refresh(){
+        try{
+          if(!worker) throw new Error("workerEndpoint 未配置");
+          requests=await apiGet();
+          applyFilters();
+        }catch(e){
+          requestBody.innerHTML=`<tr><td colspan="9" class="muted">加载失败：${esc(e.message)}</td></tr>`;
+          summary.innerHTML="";
+        }
+      }
+
+      refresh();
+      [searchInput,statusFilter,lineFilter].forEach(el=>el.addEventListener("input",applyFilters));
+      [statusFilter,lineFilter].forEach(el=>el.addEventListener("change",applyFilters));
+    })();
+  </script>
+</body>
+</html>
