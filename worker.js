@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   async fetch(request, env) {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
@@ -64,8 +64,13 @@ function getConfig(env) {
 }
 
 function ghHeaders(token) {
-  return { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+    "User-Agent": "wisdomshe-worker"
+  };
 }
+
 
 function json(payload, corsHeaders, status = 200) {
   return new Response(JSON.stringify(payload), { status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" } });
@@ -87,7 +92,8 @@ async function getGithubFile(cfg) {
   if (!res.ok) throw new Error(`GitHub read failed: ${res.status} ${await res.text()}`);
   const file = await res.json();
   const raw = decodeBase64Utf8(file.content || "");
-  const parsed = raw ? JSON.parse(raw) : { generated_at: null, applications: [] };
+  const clean = raw ? raw.replace(/^\uFEFF/, "") : "";
+  const parsed = clean ? JSON.parse(clean) : { generated_at: null, applications: [] };
   return { exists: true, sha: file.sha, data: parsed };
 }
 
