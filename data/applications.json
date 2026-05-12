@@ -1,36 +1,4 @@
 {
-  "generated_at": "2026-05-12T14:10:07.196Z",
-  "applications": [
-    {
-      "id": 3,
-      "code": "REQ-0003",
-      "kind": "diagnostic",
-      "name": "ghf",
-      "phone": "fgh",
-      "email": "",
-      "company": "",
-      "budget_band": "fgh",
-      "business_line": "industry",
-      "current_issue": "fgh",
-      "service_interest": "fgh",
-      "source_page": "/",
-      "project_stage": "website-intake",
-      "status": "new",
-      "created_at": "2026-05-12T14:09:34.854Z",
-      "updated_at": "2026-05-12T14:09:34.854Z",
-      "payload": {
-        "kind": "diagnostic",
-        "name": "ghf",
-        "phone": "fgh",
-        "email": "",
-        "company": "",
-        "budget_band": "fgh",
-        "business_line": "industry",
-        "current_issue": "fgh",
-        "service_interest": "fgh",
-        "source_page": "/",
-        "project_stage": "website-intake"
-      }
-    }
-  ]
+  "generated_at": "2026-05-12T14:10:12.514Z",
+  "applications": []
 }
