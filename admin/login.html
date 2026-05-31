@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -13,10 +13,19 @@
         <span class="eyebrow">管理后台</span>
         <h1 style="font-size:42px;">登录后台</h1>
         <p class="lead">请输入账号和密码。</p>
+
         <form id="loginForm">
-          <label class="field"><span>用户名</span><input id="username" type="text" autocomplete="username" /></label>
-          <label class="field"><span>密码</span><input id="password" type="password" autocomplete="current-password" /></label>
-          <div class="form-actions"><button class="button button-full" type="submit">登录</button></div>
+          <label class="field">
+            <span>用户名</span>
+            <input id="username" type="text" autocomplete="username" />
+          </label>
+          <label class="field">
+            <span>密码</span>
+            <input id="password" type="password" autocomplete="current-password" />
+          </label>
+          <div class="form-actions">
+            <button class="button button-full" type="submit">登录</button>
+          </div>
           <p class="form-status" id="loginStatus"></p>
         </form>
       </section>
@@ -28,28 +37,28 @@
     (function () {
       const cfg = window.WISDOMSHE_CONFIG || {};
       const gate = cfg.adminGate || {};
-      const sessionKey = "wisdomshe_admin_gate_ok";
       const form = document.getElementById("loginForm");
       const statusNode = document.getElementById("loginStatus");
 
-      const gateEnabled = gate.enabled !== false;
-      if (!gateEnabled) {
-        window.location.href = "index.html";
-        return;
-      }
-
+      const sessionKey = "wisdomshe_admin_gate_ok";
       if (sessionStorage.getItem(sessionKey) === "1") {
-        window.location.href = "index.html";
-        return;
+        window.location.href = "/admin/";
       }
 
-      form.addEventListener("submit", function (e) {
+      form.addEventListener("submit", (e) => {
         e.preventDefault();
         const u = (document.getElementById("username").value || "").trim();
         const p = (document.getElementById("password").value || "").trim();
+
+        if (!gate.enabled) {
+          sessionStorage.setItem(sessionKey, "1");
+          window.location.href = "/admin/";
+          return;
+        }
+
         if (u === gate.username && p === gate.password) {
           sessionStorage.setItem(sessionKey, "1");
-          window.location.href = "index.html";
+          window.location.href = "/admin/";
         } else {
           statusNode.textContent = "用户名或密码错误";
           statusNode.className = "form-status is-error";

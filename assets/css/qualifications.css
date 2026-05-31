@@ -1,0 +1,396 @@
+/* ========== 公司资质模块 ========== */
+#company-qualifications {
+  padding: 48px 0;
+}
+
+.qualifications-wrapper {
+  margin: 32px;
+}
+
+/* 资质统计概览 */
+.qualifications-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.overview-stat {
+  background: linear-gradient(135deg, var(--brand) 0%, #1a6b5c 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-stat::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.overview-stat .stat-number {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.overview-stat .stat-label {
+  font-size: 13px;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+}
+
+/* 资质列表 */
+.qualifications-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.qual-list-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.qual-list-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.qual-list-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, #1a6b5c 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qual-list-content h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.qual-list-content p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.qual-list-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.qual-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(15, 90, 81, 0.08);
+  color: var(--brand);
+}
+
+/* 证书画廊 - 防下载 */
+.cert-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cert-section-title span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.cert-gallery-new {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.cert-item {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  cursor: pointer;
+  /* 防下载 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cert-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.cert-item-image {
+  position: relative;
+  padding-top: 133%;
+  background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  overflow: hidden;
+  /* 防下载 */
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.cert-item-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+  /* 防下载 - 禁用拖拽 */
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* 防下载覆盖层 - 完全透明但阻止交互 */
+.cert-item-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 1;
+  /* 透明层占位 */
+}
+
+.cert-item-info {
+  padding: 14px;
+  text-align: center;
+  /* 防下载 */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.cert-item-info h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.cert-item-info p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* 证书弹窗 - 防止截图 */
+.cert-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  /* 防止被打印 */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.cert-modal.is-open {
+  display: flex;
+}
+
+.cert-modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 防截图 - 添加水印层 */
+  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.cert-modal-content img {
+  max-height: 75vh;
+  max-width: 100%;
+  width: auto;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  /* 防下载 */
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+  /* 防截图 */
+  filter: contrast(1.02) saturate(1.02);
+}
+
+/* 水印 */
+.cert-modal-content::before {
+  content: 'SHEDATAHK LIMITED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 48px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  letter-spacing: 8px;
+}
+
+.cert-modal-info {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  text-align: center;
+}
+
+.cert-modal-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 20;
+}
+
+.cert-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.cert-modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 20;
+}
+
+.cert-modal-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.cert-modal-nav.prev { left: -70px; }
+.cert-modal-nav.next { right: -70px; }
+
+.cert-modal-counter {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .cert-gallery-new {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .qualifications-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cert-gallery-new {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .qualifications-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  #company-qualifications {
+    padding: 32px 0;
+  }
+  .qualifications-overview {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .overview-stat {
+    padding: 16px;
+  }
+  .overview-stat .stat-number {
+    font-size: 32px;
+  }
+  .overview-stat .stat-label {
+    font-size: 11px;
+  }
+  .cert-gallery-new {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cert-item-info {
+    padding: 10px;
+  }
+  .cert-item-info h4 {
+    font-size: 12px;
+  }
+  .cert-modal {
+    padding: 20px;
+  }
+  .cert-modal-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+  .cert-modal-nav.prev { left: 10px; }
+  .cert-modal-nav.next { right: 10px; }
+}
+
+/* 打印样式 - 隐藏证书 */
+@media print {
+  .cert-item,
+  .cert-modal {
+    display: none !important;
+  }
+}
