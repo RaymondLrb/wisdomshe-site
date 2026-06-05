@@ -1,4 +1,36 @@
 {
-  "generated_at": "2026-05-12T14:53:23.918Z",
-  "applications": []
+  "generated_at": "2026-06-05T13:43:53.436Z",
+  "applications": [
+    {
+      "id": 1,
+      "code": "REQ-0001",
+      "kind": "diagnostic",
+      "name": "234",
+      "phone": "234",
+      "email": "",
+      "company": "",
+      "budget_band": "234",
+      "business_line": "industry",
+      "current_issue": "234",
+      "service_interest": "234",
+      "source_page": "/",
+      "project_stage": "website-intake",
+      "status": "new",
+      "created_at": "2026-06-05T13:43:53.436Z",
+      "updated_at": "2026-06-05T13:43:53.436Z",
+      "payload": {
+        "kind": "diagnostic",
+        "name": "234",
+        "phone": "234",
+        "email": "",
+        "company": "",
+        "budget_band": "234",
+        "business_line": "industry",
+        "current_issue": "234",
+        "service_interest": "234",
+        "source_page": "/",
+        "project_stage": "website-intake"
+      }
+    }
+  ]
 }
