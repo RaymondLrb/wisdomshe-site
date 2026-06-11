@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-11T12:57:08.212Z",
+  "generated_at": "2026-06-11T12:57:24.899Z",
   "applications": [
     {
       "id": 2,
@@ -46,9 +46,9 @@
       "service_interest": "234",
       "source_page": "/",
       "project_stage": "website-intake",
-      "status": "new",
+      "status": "closed",
       "created_at": "2026-06-05T13:43:53.436Z",
-      "updated_at": "2026-06-05T13:43:53.436Z",
+      "updated_at": "2026-06-11T12:57:24.899Z",
       "payload": {
         "kind": "diagnostic",
         "name": "234",
